@@ -1,0 +1,14 @@
+target/
+.git/
+.github/
+.env
+.env.*
+!.env.docker.example
+.idea/
+*.iml
+.vscode/
+.DS_Store
+HELP.md
+*.md
+!README.md
+wallet.zip

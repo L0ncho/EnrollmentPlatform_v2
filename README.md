@@ -150,6 +150,61 @@ Respuesta `201`:
 }
 ```
 
+## Producción con Docker
+
+La imagen usa Java 21, perfil `prod`, wallet Oracle en `/app/wallet` y puerto **8080**. El despliegue automático a EC2 se hace con GitHub Actions (`.github/workflows/docker-deploy.yml`) al hacer push a `main`.
+
+### Prerrequisitos
+
+- Carpeta `Wallet_ENROLLMENTPLATFORMDB/` completa (incluye `cwallet.sso` o `ewallet.pem`, `tnsnames.ora`, etc.).
+- Archivo `.env` con credenciales Oracle (copia desde `.env.docker.example`).
+- En EC2: Docker instalado, security group con TCP **8080** abierto.
+
+### Build y ejecución local
+
+```bash
+cp .env.docker.example .env
+# Edita .env con usuario y contraseña Oracle
+
+docker build -t enrollment-platform .
+docker run -d --name enrollment-platform -p 8080:8080 --env-file .env enrollment-platform
+```
+
+Con Docker Compose (mismo `.env`):
+
+```bash
+docker compose up -d --build
+```
+
+Verificar: `curl http://localhost:8080/actuator/health`
+
+### CI/CD (GitHub Actions + Docker Hub + EC2)
+
+| Evento | Acción |
+| ------ | ------ |
+| Pull request → `main` | `./mvnw test` |
+| Push → `main` | Tests, build/push imagen, deploy SSH a EC2 |
+
+**Secrets en el repositorio GitHub:**
+
+| Secret | Uso |
+| ------ | --- |
+| `DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN` | Publicar imagen `usuario/enrollment-platform:latest` |
+| `ORACLE_WALLET_BASE64` | Zip de `Wallet_ENROLLMENTPLATFORMDB` en base64 (ver abajo) |
+| `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` | Credenciales Oracle en el contenedor |
+| `SPRING_DATASOURCE_URL` | Opcional; por defecto `@enrollmentplatformdb_high` |
+| `EC2_SSH_KEY`, `EC2_HOST`, `USER_SERVER` | Deploy por SSH |
+| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN` | Credenciales AWS (token solo si son temporales) |
+
+Generar `ORACLE_WALLET_BASE64` (una vez):
+
+```bash
+zip -r wallet.zip Wallet_ENROLLMENTPLATFORMDB
+base64 -i wallet.zip | pbcopy
+```
+
+En EC2 también puedes usar `docker compose up` con `.env` y la imagen de Docker Hub (`DOCKERHUB_USERNAME` en `.env` si usas `image:` en lugar de `build`).
+
 ## Errores
 
 

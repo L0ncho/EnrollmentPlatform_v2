@@ -1,0 +1,14 @@
+services:
+  enrollment-platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${DOCKERHUB_USERNAME:-local}/enrollment-platform:latest
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      ORACLE_WALLET_DIR: /app/wallet
+      TNS_ADMIN: /app/wallet
+    restart: always

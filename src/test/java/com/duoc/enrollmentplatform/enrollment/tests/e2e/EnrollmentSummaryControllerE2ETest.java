@@ -58,6 +58,10 @@ class EnrollmentSummaryControllerE2ETest {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", containsString("summary-" + enrollmentId)));
 
+        mockMvc().perform(get("/enrollments/{id}/summary", enrollmentId).param("format", "pdf"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/pdf"));
+
         mockMvc().perform(put("/enrollments/{id}", enrollmentId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""

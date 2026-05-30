@@ -5,6 +5,9 @@ public class EnrollmentLineDTO {
     public String courseName;
     public double unitPrice;
 
+    public EnrollmentLineDTO() {
+    }
+
     public EnrollmentLineDTO(String courseId, String courseName, double unitPrice) {
         this.courseId = courseId;
         this.courseName = courseName;

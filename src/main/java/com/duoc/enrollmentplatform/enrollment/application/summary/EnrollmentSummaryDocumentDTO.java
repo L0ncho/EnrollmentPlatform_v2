@@ -13,6 +13,9 @@ public class EnrollmentSummaryDocumentDTO {
     public List<EnrollmentLineDTO> lines;
     public double totalAmount;
 
+    public EnrollmentSummaryDocumentDTO() {
+    }
+
     public EnrollmentSummaryDocumentDTO(String enrollmentId, String studentId, String studentFullName,
                                         String studentEmail, String enrolledAt, List<EnrollmentLineDTO> lines,
                                         double totalAmount) {

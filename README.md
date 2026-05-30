@@ -48,11 +48,16 @@ src/main/resources/
 
 ## Ejecutar
 
-**Perfil `local` (H2)**
+**Perfil `local` (H2 + LocalStack S3)**
 
 ```bash
+docker compose up -d localstack
+docker exec "$(docker ps -qf 'ancestor=localstack/localstack:4.4.0')" \
+  awslocal s3 mb s3://enrollment-platform-summaries
 ./run-local.sh
 ```
+
+`run-local.sh` fuerza el perfil `local`, exporta credenciales `test`/`test` para LocalStack y **ignora** las variables Oracle de `.env` (si las tienes para prod). Si tienes un `.env` con `SPRING_PROFILES_ACTIVE=prod`, no afecta: este script siempre usa `local`.
 
 **Perfil `prod` (Oracle + wallet mTLS)** — coloca la wallet descargada en `Wallet_ENROLLMENTPLATFORMDB/` (incluye `tnsnames.ora`, `sqlnet.ora`, `ewallet.pem`), crea `.env` y arranca:
 
@@ -188,21 +193,52 @@ La imagen usa Java 21, perfil `prod`, wallet Oracle en `/app/wallet` y puerto **
 
 ### Build y ejecución local
 
+Los endpoints de `/enrollments` y resúmenes S3 requieren LocalStack y el bucket S3 (igual que con `./run-local.sh`). Sin esto, esas rutas responden **500**.
+
+**1. LocalStack y bucket S3**
+
+```bash
+docker compose up -d localstack
+docker exec "$(docker ps -qf 'ancestor=localstack/localstack:4.4.0')" \
+  awslocal s3 mb s3://enrollment-platform-summaries
+```
+
+**2. Variables de entorno**
+
 ```bash
 cp .env.docker.example .env
-# Edita .env con usuario y contraseña Oracle
+# Edita .env: usuario/contraseña Oracle y variables AWS.
+# Con Docker Compose (misma red que localstack):
+#   AWS_S3_ENDPOINT=http://localstack:4566
+#   AWS_ACCESS_KEY_ID=test
+#   AWS_SECRET_ACCESS_KEY=test
+#   AWS_S3_BUCKET=enrollment-platform-summaries
+```
 
+**3. Imagen y contenedor**
+
+```bash
 docker build -t enrollment-platform .
 docker run -d --name enrollment-platform -p 8080:8080 --env-file .env enrollment-platform
 ```
 
-Con Docker Compose (mismo `.env`):
+Si usas `docker run` sin la red de Compose, LocalStack en el host se alcanza con `AWS_S3_ENDPOINT=http://host.docker.internal:4566` (macOS/Windows).
+
+**Con Docker Compose** (app + LocalStack en la misma red; recomendado en local):
 
 ```bash
 docker compose up -d --build
 ```
 
-Verificar: `curl http://localhost:8080/actuator/health`
+Verificar:
+
+```bash
+curl http://localhost:8080/actuator/health
+curl -X POST http://localhost:8080/enrollments \
+  -H "Content-Type: application/json" \
+  -d '{"studentId": "s-001", "courseIds": ["c-001", "c-002"]}'
+curl http://localhost:8080/enrollments/summaries
+```
 
 ### CI/CD (GitHub Actions + Docker Hub + EC2)
 

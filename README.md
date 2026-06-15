@@ -181,6 +181,14 @@ Body (solo `courseIds`; el `studentId` no cambia):
 
 Si existe resumen en S3, se regenera y reemplaza automáticamente.
 
+## Seguridad
+
+En producción, la capa de seguridad **activa hoy** es **AWS API Gateway** con un **JWT Authorizer** configurado contra **Azure AD B2C**. Los clientes (Postman, frontend, integraciones) deben consumir la API a través del **Invoke URL** del Gateway enviando `Authorization: Bearer <access_token>`; el tráfico directo a `http://<IP_EC2>:8080` no pasa por esa validación.
+
+Adicionalmente, el proyecto incluye una capa **opcional** de JWT en Spring Boot (`ENROLLMENT_SECURITY_JWT_ENABLED`, desactivada por defecto) para defensa en profundidad si el puerto 8080 queda expuesto.
+
+Diagramas, variables de entorno, escenarios (Gateway solo, Spring solo, ambas capas) y cómo activar el toggle: **[docs/seguridad-jwt.md](docs/seguridad-jwt.md)**.
+
 ## Producción con Docker
 
 La imagen usa Java 21, perfil `prod`, wallet Oracle en `/app/wallet` y puerto **8080**. El despliegue automático a EC2 se hace con GitHub Actions (`.github/workflows/docker-deploy.yml`) al hacer push a `main`.
@@ -242,7 +250,7 @@ curl http://localhost:8080/enrollments/summaries
 
 ### CI/CD (GitHub Actions + Docker Hub + EC2)
 
-Guía paso a paso (secrets, EC2, push a `main`, verificación): **[docs/guia-despliegue-ec2.md](docs/guia-despliegue-ec2.md)**.
+Guía paso a paso (secrets, EC2, push a `main`, verificación): **[docs/guia-despliegue-ec2.md](docs/guia-despliegue-ec2.md)**. Seguridad JWT (Gateway + toggle Spring): **[docs/seguridad-jwt.md](docs/seguridad-jwt.md)**.
 
 | Evento | Acción |
 | ------ | ------ |

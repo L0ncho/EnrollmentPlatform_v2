@@ -32,6 +32,11 @@ Configurar en **Settings → Secrets and variables → Actions**:
 | `AWS_REGION` | Región del bucket S3 (ej. `us-east-1`) |
 | `AWS_S3_BUCKET` | Bucket donde se guardan los resúmenes (`{enrollmentId}/summary.json`) |
 | `SPRING_DATASOURCE_URL` | Opcional. Por defecto: `jdbc:oracle:thin:@enrollmentplatformdb_high` |
+| `ENROLLMENT_SECURITY_JWT_ENABLED` | Opcional. `true` activa JWT en Spring; default: `false` |
+| `AZURE_B2C_JWK_SET_URI` | Requerido si JWT Spring activo. URL JWK set de Azure AD B2C |
+| `AZURE_B2C_AUDIENCE` | Requerido si JWT Spring activo. Client ID de la app en Azure |
+
+Detalle de las capas de seguridad (Gateway vs Spring): [seguridad-jwt.md](seguridad-jwt.md).
 
 ### S3 en producción
 

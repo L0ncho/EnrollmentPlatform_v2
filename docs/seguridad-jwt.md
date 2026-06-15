@@ -130,8 +130,8 @@ Ruta pública sin token cuando Spring JWT está activo: `GET /actuator/health`.
 | Variable | Default | Descripción |
 | -------- | ------- | ----------- |
 | `ENROLLMENT_SECURITY_JWT_ENABLED` | `false` | Activa validación JWT en Spring (solo perfil `prod`) |
-| `AZURE_B2C_JWK_SET_URI` | — | URL de claves públicas del user flow B2C |
-| `AZURE_B2C_AUDIENCE` | — | Client ID de la app registrada en Azure |
+| `AZURE_B2C_JWK_SET_URI` | — | Requerido **solo si** JWT Spring está activo |
+| `AZURE_B2C_AUDIENCE` | — | Requerido **solo si** JWT Spring está activo |
 | `ENROLLMENT_SECURITY_LOG_LEVEL` | `INFO` | Nivel de log de Spring Security (`TRACE`, `DEBUG`, etc.) |
 
 Ejemplo de `AZURE_B2C_JWK_SET_URI`:
@@ -183,7 +183,9 @@ La configuración vive en [`SecurityConfiguration.java`](../src/main/java/com/du
 - `enrollment.security.jwt.enabled=false` → `permitAll()` en todos los endpoints
 - `enrollment.security.jwt.enabled=true` → OAuth2 Resource Server JWT + `/actuator/health` público
 
-Propiedades en [`application-prod.properties`](../src/main/resources/application-prod.properties).
+Propiedades en [`application-prod.properties`](../src/main/resources/application-prod.properties) y [`SecurityConfiguration.java`](../src/main/java/com/duoc/enrollmentplatform/factory/SecurityConfiguration.java) (solo cuando el toggle está activo).
+
+Con `ENROLLMENT_SECURITY_JWT_ENABLED=false` **no hace falta** definir `AZURE_B2C_*` en GitHub Actions ni en EC2: la auto-configuración OAuth2 de Spring Boot está excluida y no se crea `JwtDecoder`.
 
 ---
 

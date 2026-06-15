@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -48,8 +49,9 @@ class SecurityConfigurationDisabledE2ETest {
 
 @SpringBootTest(properties = {
         "enrollment.security.jwt.enabled=true",
-        "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://example.com/keys",
-        "spring.security.oauth2.resourceserver.jwt.audiences=test-audience"
+        "AZURE_B2C_JWK_SET_URI=https://example.com/keys",
+        "AZURE_B2C_AUDIENCE=test-audience",
+        "spring.main.allow-bean-definition-overriding=true"
 })
 @ActiveProfiles("local")
 @Import(SecurityConfigurationEnabledE2ETest.TestJwtDecoderConfiguration.class)
@@ -83,6 +85,7 @@ class SecurityConfigurationEnabledE2ETest {
     static class TestJwtDecoderConfiguration {
 
         @Bean
+        @Primary
         JwtDecoder jwtDecoder() {
             return token -> Jwt.withTokenValue(token)
                     .header("alg", "none")
@@ -102,9 +105,7 @@ class SecurityConfigurationFailFastTest {
         assertThatThrownBy(() -> new SpringApplication(EnrollmentPlatformApplication.class)
                         .run(
                                 "--spring.profiles.active=local",
-                                "--enrollment.security.jwt.enabled=true",
-                                "--spring.security.oauth2.resourceserver.jwt.jwk-set-uri=",
-                                "--spring.security.oauth2.resourceserver.jwt.audiences="))
+                                "--enrollment.security.jwt.enabled=true"))
                 .hasRootCauseInstanceOf(IllegalStateException.class)
                 .hasRootCauseMessage(
                         "ENROLLMENT_SECURITY_JWT_ENABLED=true requires AZURE_B2C_JWK_SET_URI to be set");

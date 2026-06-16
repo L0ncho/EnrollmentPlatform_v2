@@ -104,7 +104,7 @@ jobs:
           AZURE_B2C_AUDIENCE: ${{ secrets.AZURE_B2C_AUDIENCE }}
         run: |
           # Si no hay secret de URL, usamos el alias high del tnsnames.ora.
-          DATASOURCE_URL="${SPRING_DATASOURCE_URL:-jdbc:oracle:thin:@enrollmentplatformdb_high}"
+          DATASOURCE_URL="${SPRING_DATASOURCE_URL:-jdbc:oracle:thin:@learningplatformvalidation_high}"
           ssh -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \

@@ -102,6 +102,7 @@ jobs:
           ENROLLMENT_SECURITY_JWT_ENABLED: ${{ secrets.ENROLLMENT_SECURITY_JWT_ENABLED }}
           AZURE_B2C_JWK_SET_URI: ${{ secrets.AZURE_B2C_JWK_SET_URI }}
           AZURE_B2C_AUDIENCE: ${{ secrets.AZURE_B2C_AUDIENCE }}
+          ENROLLMENT_SECURITY_LOG_LEVEL: ${{ secrets.ENROLLMENT_SECURITY_LOG_LEVEL }}
         run: |
           # Si no hay secret de URL, usamos el alias high del tnsnames.ora.
           DATASOURCE_URL="${SPRING_DATASOURCE_URL:-jdbc:oracle:thin:@learningplatformvalidation_high}"
@@ -130,8 +131,9 @@ jobs:
             -e AWS_SESSION_TOKEN="${AWS_SESSION_TOKEN}" \
             -e AWS_REGION="${AWS_REGION:-us-east-1}" \
             -e AWS_S3_BUCKET="${AWS_S3_BUCKET}" \
-            -e ENROLLMENT_SECURITY_JWT_ENABLED="${ENROLLMENT_SECURITY_JWT_ENABLED:-false}" \
+            -e ENROLLMENT_SECURITY_JWT_ENABLED="${ENROLLMENT_SECURITY_JWT_ENABLED:-true}" \
             -e AZURE_B2C_JWK_SET_URI="${AZURE_B2C_JWK_SET_URI}" \
             -e AZURE_B2C_AUDIENCE="${AZURE_B2C_AUDIENCE}" \
+            -e ENROLLMENT_SECURITY_LOG_LEVEL="${ENROLLMENT_SECURITY_LOG_LEVEL:-INFO}" \
             "${IMAGE}"
           EOF

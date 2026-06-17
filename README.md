@@ -181,13 +181,18 @@ Body (solo `courseIds`; el `studentId` no cambia):
 
 Si existe resumen en S3, se regenera y reemplaza automáticamente.
 
-## Seguridad
 
-En producción, la capa de seguridad **activa hoy** es **AWS API Gateway** con un **JWT Authorizer** configurado contra **Azure AD B2C**. Los clientes (Postman, frontend, integraciones) deben consumir la API a través del **Invoke URL** del Gateway enviando `Authorization: Bearer <access_token>`; el tráfico directo a `http://<IP_EC2>:8080` no pasa por esa validación.
+## Seguridad e Integración 
 
-Adicionalmente, el proyecto incluye una capa **opcional** de JWT en Spring Boot (`ENROLLMENT_SECURITY_JWT_ENABLED`, desactivada por defecto) para defensa en profundidad si el puerto 8080 queda expuesto.
+En producción, la capa de seguridad **activa** está estructurada en dos niveles (Defensa en Profundidad) utilizando un IDaaS y un API Manager:
 
-Diagramas, variables de entorno, escenarios (Gateway solo, Spring solo, ambas capas) y cómo activar el toggle: **[docs/seguridad-jwt.md](docs/seguridad-jwt.md)**.
+1. **Gestión de Identidades (IDaaS):** **Azure AD B2C** se utiliza para el registro y autenticación de usuarios (Flujo `B2C_1_RegistroLogin`). Este servicio emite tokens JWT firmados criptográficamente.
+2. **Gateway Perimetral:** **AWS API Gateway** expone el Invoke URL público de la API. Tiene configurado un **JWT Authorizer** que valida la firma y la URL del emisor (`iss`) del token de Azure antes de enrutar el tráfico hacia EC2.
+3. **Validación Interna (Microservicio):** El proyecto incluye una capa JWT en Spring Boot mediante Spring Security configurado como un *OAuth2 Resource Server*. Esta capa extrae el token reenviado, valida los *claims* y protege de forma *stateless* los endpoints (activable vía el toggle `ENROLLMENT_SECURITY_JWT_ENABLED` para proteger el puerto 8080 de accesos directos).
+
+Los clientes (Postman, frontend, integraciones) deben consumir la API a través del **Invoke URL** del Gateway enviando `Authorization: Bearer <access_token>`; el tráfico directo a `http://<IP_EC2>:8080` sin token será rechazado con `401 Unauthorized`.
+
+Configurar secrets `ENROLLMENT_SECURITY_JWT_ENABLED`, `AZURE_B2C_JWK_SET_URI` y `AZURE_B2C_AUDIENCE` en GitHub Actions antes de desplegar. Detalle: **[docs/seguridad-jwt.md](docs/seguridad-jwt.md)**.
 
 ## Producción con Docker
 
@@ -266,5 +271,6 @@ Guía paso a paso (secrets, EC2, push a `main`, verificación): **[docs/guia-des
 | 404    | Estudiante o curso no encontrado                                      |
 | 422    | Regla de negocio violada (nombre vacío, lista vacía, precio negativo) |
 | 500    | Error técnico inesperado                                              |
+
 
 

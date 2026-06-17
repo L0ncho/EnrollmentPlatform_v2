@@ -113,11 +113,17 @@ Secuencia del job `build-and-deploy`:
 Sustituir `<IP_EC2>` por la IP pública de la instancia:
 
 ```text
-http://<IP_EC2>:8080/actuator/health
-http://<IP_EC2>:8080/courses
+http://<IP_EC2>:8080/actuator/health          → 200 (sin token)
+http://<IP_EC2>:8080/courses                  → 401 (sin token, JWT Spring activo)
 ```
 
-Endpoint `/actuator/health`: respuesta con `"status":"UP"`.
+Con token Azure vía API Gateway:
+
+```text
+https://<api-id>.execute-api.us-east-1.amazonaws.com/dev/courses
+Authorization: Bearer <access_token>
+→ 200
+```
 
 Errores de despliegue: revisar el job `build-and-deploy` en **Actions** del repositorio.
 

@@ -192,7 +192,7 @@ En producción, la capa de seguridad **activa** está estructurada en dos nivele
 
 Los clientes (Postman, frontend, integraciones) deben consumir la API a través del **Invoke URL** del Gateway enviando `Authorization: Bearer <access_token>`; el tráfico directo a `http://<IP_EC2>:8080` sin token será rechazado con `401 Unauthorized`.
 
-Diagramas, variables de entorno, escenarios (Gateway solo, Spring solo, ambas capas) y cómo activar el toggle: **[docs/seguridad-jwt.md](docs/seguridad-jwt.md)**.
+Configurar secrets `ENROLLMENT_SECURITY_JWT_ENABLED`, `AZURE_B2C_JWK_SET_URI` y `AZURE_B2C_AUDIENCE` en GitHub Actions antes de desplegar. Detalle: **[docs/seguridad-jwt.md](docs/seguridad-jwt.md)**.
 
 ## Producción con Docker
 

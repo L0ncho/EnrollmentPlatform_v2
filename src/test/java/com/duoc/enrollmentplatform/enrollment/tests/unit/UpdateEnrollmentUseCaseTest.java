@@ -4,6 +4,7 @@ import com.duoc.enrollmentplatform.courses.domain.entities.Course;
 import com.duoc.enrollmentplatform.courses.domain.repositories.InMemoryCourseRepository;
 import com.duoc.enrollmentplatform.enrollment.application.CreateEnrollmentUseCase;
 import com.duoc.enrollmentplatform.enrollment.application.EnrollmentSummaryDTO;
+import com.duoc.enrollmentplatform.enrollment.application.ports.EnrollmentMessagePublisher;
 import com.duoc.enrollmentplatform.enrollment.application.summary.EnrollmentSummaryGenerator;
 import com.duoc.enrollmentplatform.enrollment.application.UpdateEnrollmentUseCase;
 import com.duoc.enrollmentplatform.enrollment.domain.entities.Student;
@@ -34,7 +35,8 @@ class UpdateEnrollmentUseCaseTest {
                 Student.create(Id.create("s-1"), "Juan", Email.create("juan@duoc.cl"))));
         InMemoryEnrollmentRepository enrollments = new InMemoryEnrollmentRepository();
 
-        CreateEnrollmentUseCase create = new CreateEnrollmentUseCase(courses, students, enrollments, generator, storage, null);
+        // Se agregó el mock del publisher para satisfacer el constructor
+        CreateEnrollmentUseCase create = new CreateEnrollmentUseCase(courses, students, enrollments, generator, storage, mock(EnrollmentMessagePublisher.class));
         EnrollmentSummaryDTO created = create.execute("s-1", List.of("c-1"));
 
         UpdateEnrollmentUseCase update = new UpdateEnrollmentUseCase(courses, enrollments, students, generator, storage);

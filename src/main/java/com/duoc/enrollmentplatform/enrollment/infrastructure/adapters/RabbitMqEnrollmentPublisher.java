@@ -34,4 +34,5 @@ public class RabbitMqEnrollmentPublisher implements EnrollmentMessagePublisher {
         
         System.out.println("Mensaje enviado a RabbitMQ exitosamente: " + payload);
     }
+    
 }

@@ -4,6 +4,7 @@ import com.duoc.enrollmentplatform.courses.domain.entities.Course;
 import com.duoc.enrollmentplatform.courses.domain.repositories.InMemoryCourseRepository;
 import com.duoc.enrollmentplatform.enrollment.application.CreateEnrollmentUseCase;
 import com.duoc.enrollmentplatform.enrollment.application.EnrollmentSummaryDTO;
+import com.duoc.enrollmentplatform.enrollment.application.ports.EnrollmentMessagePublisher; // <-- IMPORT AGREGADO
 import com.duoc.enrollmentplatform.enrollment.application.summary.EnrollmentSummaryGenerator;
 import com.duoc.enrollmentplatform.enrollment.domain.entities.Student;
 import com.duoc.enrollmentplatform.enrollment.domain.repositories.InMemoryEnrollmentRepository;
@@ -15,6 +16,7 @@ import com.duoc.enrollmentplatform.shared.domain.valueobjects.Id;
 import com.duoc.enrollmentplatform.shared.domain.valueobjects.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
@@ -39,7 +41,8 @@ class CreateEnrollmentUseCaseTest {
                 students,
                 new InMemoryEnrollmentRepository(),
                 new EnrollmentSummaryGenerator(),
-                summaryStorage);
+                summaryStorage,
+                mock(EnrollmentMessagePublisher.class)); // <-- MOCK INYECTADO AQUÍ
     }
 
     @Test void createsEnrollmentWithCorrectTotalForMultipleCourses() {

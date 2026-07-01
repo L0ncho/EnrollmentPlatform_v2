@@ -16,7 +16,7 @@ import com.duoc.enrollmentplatform.shared.domain.valueobjects.Money;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-
+import static org.mockito.Mockito.mock;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,7 +34,7 @@ class UpdateEnrollmentUseCaseTest {
                 Student.create(Id.create("s-1"), "Juan", Email.create("juan@duoc.cl"))));
         InMemoryEnrollmentRepository enrollments = new InMemoryEnrollmentRepository();
 
-        CreateEnrollmentUseCase create = new CreateEnrollmentUseCase(courses, students, enrollments, generator, storage);
+        CreateEnrollmentUseCase create = new CreateEnrollmentUseCase(courses, students, enrollments, generator, storage, null);
         EnrollmentSummaryDTO created = create.execute("s-1", List.of("c-1"));
 
         UpdateEnrollmentUseCase update = new UpdateEnrollmentUseCase(courses, enrollments, students, generator, storage);

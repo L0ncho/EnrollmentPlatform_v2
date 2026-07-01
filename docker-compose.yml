@@ -8,6 +8,15 @@ services:
       DEFAULT_REGION: us-east-1
     volumes:
       - localstack-data:/var/lib/localstack
+      
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"   # Puerto de comunicación AMQP
+      - "15672:15672" # Puerto de la interfaz web de administración
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
 
   enrollment-platform:
     build:
@@ -24,6 +33,6 @@ services:
     restart: always
     depends_on:
       - localstack
-
+      - rabbitmq
 volumes:
   localstack-data:

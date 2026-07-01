@@ -5,25 +5,37 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @ActiveProfiles("local")
+@Import(EnrollmentControllerE2ETest.MockConfig.class)
 class EnrollmentControllerE2ETest {
+
+    // Le pasamos el mock directamente al contexto sin usar @MockBean
+    @TestConfiguration
+    static class MockConfig {
+        @Bean
+        @Primary
+        public EnrollmentMessagePublisher enrollmentMessagePublisher() {
+            return mock(EnrollmentMessagePublisher.class);
+        }
+    }
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @MockBean
-    private EnrollmentMessagePublisher enrollmentMessagePublisher;
 
     private MockMvc mockMvc;
 
